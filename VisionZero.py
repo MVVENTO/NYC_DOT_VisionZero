@@ -4,9 +4,61 @@
 #              and dynamically update a new Column for each Month coming up
 #              Fully Automate this process using Database
 
+#Install Libraires to create an excel spreedsheet
 from openpyxl import Workbook, load_workbook
 from openpyxl.utils import get_column_letter
-from openpyxl.styles import fonts
+from openpyxl.styles import Font
+
+
+##################### Option 1 ######################
+
+#          Install Libraires to convert MySQL table to Pandas DataFrame(python dictionary) with SQLAlchemy
+#pip install PyMySQL
+#pip install SQLAlchemy
+
+#from sqlalchemy import create_engine
+#import pymysql
+#import pandas as pd
+
+#              convert MySQL Table to DataFrame with PyMySQL + SQLAlchemy
+#db_connection_str = 'mysql+pymysql://root' + password + '@localhost:3306/test' #user , password, host
+#db_connection = create_engine(db_connection_str)
+
+#df = pd.read_sql('SELECT * FROM', con=db_connection)
+#df.to_dict()
+
+#df.to_dict('records')
+
+################### Option 2 ##########################
+
+#               Convert MySQL Table to DataFrame with mysql.connector
+#import pandas as pd
+#import mysql.connector
+
+# Setup MySQL connection
+#db = mysql.connector.connect(
+ #   host="localhost",               #your host, localhost
+ #   user="root",                    #username
+ #   password=password,              #password
+ #   database="test"                 #name of the database
+ #)
+
+ # You must create a Cursor object. It will let you execute all the queries you need
+ #cur = db.cursor()
+
+ #Use all the SQL you like
+ #cur.execute("SELECT * FROM")
+
+ #put it all to a data fram
+ #df_sql_data = pd.DataFrame(cur.fetchall())
+ #close the session
+ #db.close()
+
+ #show the data
+ #df_sql_data.to_dict()
+
+
+
 
 data = {
 
@@ -21,7 +73,7 @@ data = {
 		"April 2022 (spatial)":0,
 		"May 2022 (spatial)":0,
         # dynamically add months to python script
-		"YTD Total 2022 (spatial)":0, # sum of Columns C2, D2, E2, F2, G2,
+		"YTD Total 2022 (spatial)": 0, # sum of Columns C2, D2, E2, F2, G2,
         "Overall Target" : 250,
         "Primary Contacts" : "Ann Marie Doherty/ Alicia Posner/ Seth Hostetter",
         "Data Contacts" : "Seth Hostetter/Arthur Getman"
@@ -173,3 +225,46 @@ data = {
         "Data Contacts" : "Jason Fitzsimmons"
     },
 }
+
+# Loads exsisting workbook
+# wb = load_workbook('Vision Zero Metrics Jan 2022 to May 2022_20220616_MV.xlsx')
+# ws = wb.active
+# print(ws)
+
+wb = Workbook()
+ws = wb.active
+ws.title = "Vision Zero Metrics Jan 2022 to May 2022_20220616"
+
+headings = ['No'] + list(data['5'].keys())
+ws.append(headings)
+
+#### adding new Months example 1 ####
+#new_information = {"JUNE 2022 (spatial)": 0}
+#data.update(new_information)
+#print(data)
+
+#### adding new Months example 2 ####
+#merging and updating dictionaries with | and |=
+#JUNE 2022 (spatial) = {"number value"}
+#JULY 2022 (spatial) = {"number value"}
+#JUNE 2022 (spatial) | JULY 2022 (spatial)
+
+
+
+#prints Values into rows
+for Metric_name in data:
+    metrics = list(data[Metric_name].values())
+    ws.append([Metric_name]+ metrics)
+
+#Makes cells bold
+for col in range(1, 19):
+	ws[get_column_letter(col) + '1'].font = Font(bold=True, color="0099CCFF")
+
+#insert a new blank column for each new month
+for col in range(7, 13):
+    ws.insert_cols(7)
+
+
+
+#save Spreedsheet
+wb.save("Vision Zero Metrics Jan 2022 to May 2022_20220616.xlsx")
